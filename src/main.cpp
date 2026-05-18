@@ -1,95 +1,114 @@
 #include <Arduino.h>
 #include <WiFi.h>
+#include <WiFiClientSecure.h>
+
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <LittleFS.h>
+
+#include <FirebaseClient.h>
+
+#define WIFI_SSID "TIFEH100"
+#define WIFI_PASSWORD "Doyouknowlade^"
+
+#define API_KEY "AIzaSyC6OE3-jl73z41B4rWEO699fBBaqJPQPRI"
+#define DATABASE_URL "https://water-tank-monitoring-sy-9fbf3-default-rtdb.firebaseio.com/"
+#define USER_EMAIL "successasokere4@gmail.com"
+#define USER_PASSWORD "Doyouknowlade^"
 
 int L1 = 21;
 int L2 = 22;
 int L3 = 23;
 int L4 = 4;
 
-int s1, s2, s3, s4;
+WiFiClientSecure ssl;
+AsyncClientClass aClient(ssl);
 
-const char* ssid = "TIFEH100";
-const char* password = "Doyouknowlade^";
+UserAuth user_auth(API_KEY, USER_EMAIL, USER_PASSWORD);
+
+FirebaseApp app;
+
+RealtimeDatabase Database;
 
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 
-void onWsEvent(AsyncWebSocket *server,
-               AsyncWebSocketClient *client,
-               AwsEventType type,
-               void *arg,
-               uint8_t *data,
-               size_t len) {
+int s1, s2, s3, s4;
 
-  if (type == WS_EVT_CONNECT) {
-    client->text("connected");
-  }
-}
+int level = 0;
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
-
-
-  if (!LittleFS.begin()) {
-    Serial.println("LittleFS failed");
-    return;
-  }
 
   pinMode(L1, INPUT_PULLUP);
   pinMode(L2, INPUT_PULLUP);
   pinMode(L3, INPUT_PULLUP);
   pinMode(L4, INPUT_PULLUP);
 
-  WiFi.begin(ssid, password);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED)
+  {
     delay(500);
   }
-  
-  Serial.println("Connected to WiFi");
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
 
-  ws.onEvent(onWsEvent);
+  ssl.setInsecure();
+
+  initializeApp(aClient, app, getAuth(user_auth));
+
+  app.getApp<RealtimeDatabase>(Database);
+
+  Database.url(DATABASE_URL);
+
+  ws.onEvent([](AsyncWebSocket *, AsyncWebSocketClient *, AwsEventType type, void *, uint8_t *, size_t)
+             {
+               if (type == WS_EVT_CONNECT)
+                 Serial.println("WS connected");
+             });
+
   server.addHandler(&ws);
 
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(LittleFS, "/index.html", "text/html");
-  });
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
+              request->send(LittleFS, "/index.html", "text/html");
+            });
 
   server.begin();
 }
 
-int calculateLevel() {
-
+int readLevel()
+{
   s1 = digitalRead(L1);
   s2 = digitalRead(L2);
   s3 = digitalRead(L3);
   s4 = digitalRead(L4);
 
-  if (s4 == 0) return 100;
-  if (s3 == 0) return 75;
-  if (s2 == 0) return 50;
-  if (s1 == 0) return 25;
+  if (s4 == LOW) return 100;
+  if (s3 == LOW) return 75;
+  if (s2 == LOW) return 50;
+  if (s1 == LOW) return 25;
 
   return 0;
 }
 
-void loop() {
+void loop()
+{
+  app.loop();
 
-  int level = calculateLevel();
+  level = readLevel();
 
-  String json = "{";
-  json += "\"level\":" + String(level);
-  json += "}";
+  String json = "{\"level\":" + String(level) + "}";
 
   ws.textAll(json);
-  ws.cleanupClients();
 
-  Serial.println(json);
+  static int last = -1;
 
-  delay(300);
+  if (level != last)
+  {
+    last = level;
+    Database.set<int>(aClient, "/tank/level", level);
+  }
+
+  delay(1000);
 }
