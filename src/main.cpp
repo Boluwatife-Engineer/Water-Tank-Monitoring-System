@@ -1,20 +1,19 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
-
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <LittleFS.h>
-
 #include <FirebaseClient.h>
+#include "secrets.h"
 
-#define WIFI_SSID "TIFEH100"
-#define WIFI_PASSWORD "Doyouknowlade^"
+#define WIFI_SSID WIFI_SSID
+#define WIFI_PASSWORD WIFI_PASSWORD
+#define API_KEY API_KEY
+#define DATABASE_URL DATABASE_URL
+#define USER_EMAIL USER_EMAIL
+#define USER_PASSWORD USER_PASSWORD
 
-#define API_KEY "AIzaSyC6OE3-jl73z41B4rWEO699fBBaqJPQPRI"
-#define DATABASE_URL "https://water-tank-monitoring-sy-9fbf3-default-rtdb.firebaseio.com/"
-#define USER_EMAIL "successasokere4@gmail.com"
-#define USER_PASSWORD "Doyouknowlade^"
 
 int L1 = 21;
 int L2 = 22;

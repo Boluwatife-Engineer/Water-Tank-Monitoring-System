@@ -8,3 +8,4 @@
 *.elf
 *.map
 build/
+/include/secrets.h
