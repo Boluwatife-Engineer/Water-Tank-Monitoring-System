@@ -1,35 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
- <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <link rel="stylesheet" href="./style.css">
- <title>Water Level Monitor</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <link rel="stylesheet" href="./style.css">
+
+  <title>Water Level Monitor</title>
 </head>
 
 <body>
 
-  <div>
-    <div class="title">WATER LEVEL MONITOR</div>
+  <div class="dashboard">
 
-    <div class="tank">
-      <div class="fill" id="fill"></div>
+    <div class="tank-section">
+
+      <div class="title">
+        WATER LEVEL MONITOR
+      </div>
+
+      <div class="tank">
+        <div class="fill" id="fill"></div>
+      </div>
+
+      <div class="label" id="percent">
+        0%
+      </div>
+
+      <div class="status" id="status">
+        EMPTY
+      </div>
+
     </div>
 
-    <div class="label" id="percent">0%</div>
-    <div class="status" id="status">EMPTY</div>
+
+
+    <div class="logs-section">
+
+      <h1>Data Logs</h1>
+
+      <div class="filters">
+
+        <button data-filter="all">
+          All
+        </button>
+
+        <button data-filter="today">
+          Today
+        </button>
+        <button data-filter="low">
+          Low
+        </button>
+
+        <button data-filter="high">
+          High
+        </button>
+
+
+      </div>
+
+
+
+      <div class="logs-table">
+
+        <div class="logs-header">
+          <span>Date</span>
+          <span>Time</span>
+          <span>Level</span>
+        </div>
+
+        <div id="logs-body"></div>
+
+      </div>
+
+    </div>
+
   </div>
 
-  <div id="logs">
-    <h1>Data logs</h1>
-  </div>
-
-
-<script src="script.js" type="module"></script>
+  <script src="script.js" type="module"></script>
 
 </body>
+
 </html>
-
-
-
-

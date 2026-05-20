@@ -8,7 +8,8 @@ import {
 
 
 
-let socket = new WebSocket("ws://" + location.host + "/ws");
+let socket =
+  new WebSocket("ws://" + location.host + "/ws");
 
 socket.onmessage = function(event)
 {
@@ -16,9 +17,11 @@ socket.onmessage = function(event)
 
   let level = data.level;
 
-  document.getElementById("fill").style.height = level + "%";
+  document.getElementById("fill").style.height =
+    level + "%";
 
-  document.getElementById("percent").innerText = level + "%";
+  document.getElementById("percent").innerText =
+    level + "%";
 
   let status = "EMPTY";
   let cls = "";
@@ -47,7 +50,8 @@ socket.onmessage = function(event)
     cls = "high";
   }
 
-  let statusEl = document.getElementById("status");
+  let statusEl =
+    document.getElementById("status");
 
   statusEl.innerText = status;
   statusEl.className = cls;
@@ -65,45 +69,123 @@ const firebaseConfig = {
   measurementId: "G-XQVNN1GPRM"
 };
 
-const app = initializeApp(firebaseConfig);
+const app =
+  initializeApp(firebaseConfig);
 
-const db = getDatabase(app);
+const db =
+  getDatabase(app);
 
-const logsRef = ref(db, "/tank/logs");
+const logsRef =
+  ref(db, "/tank/logs");
+
+
+
+let allLogs = [];
+
+
 
 onValue(logsRef, (snapshot) =>
 {
-  console.log("Firebase data:", snapshot.val());
-
   const data = snapshot.val();
 
-  const logContainer = document.getElementById("logs");
+  if (!data) return;
 
-  logContainer.innerHTML = "<h1>Data Logs</h1>";
-
-  if (!data)
+  allLogs = Object.keys(data).map((key) =>
   {
-    console.log("No data found");
-    return;
-  }
+    return {
+      timestamp: Number(key),
+      level: data[key].level
+    };
+  });
 
-  const keys = Object.keys(data).reverse();
+  allLogs.reverse();
 
-  keys.forEach((key) =>
+  renderLogs(allLogs);
+});
+
+
+
+function renderLogs(logs)
+{
+  const logsBody =
+    document.getElementById("logs-body");
+
+  logsBody.innerHTML = "";
+
+  logs.forEach((log) =>
   {
-    const item = data[key];
+    const dateObj =
+      new Date(log.timestamp * 1000);
 
-    const date = new Date(Number(key) * 1000);
+    const date =
+      dateObj.toLocaleDateString();
 
-    const readableTime = date.toLocaleString();
+    const time =
+      dateObj.toLocaleTimeString();
 
-    const div = document.createElement("div");
+    const row =
+      document.createElement("div");
 
-    div.className = "log-item";
+    row.className = "log-item";
 
-    div.innerText =
-      `${readableTime} → ${item.level}%`;
+    row.innerHTML = `
+      <span>${date}</span>
+      <span>${time}</span>
+      <span>${log.level}%</span>
+    `;
 
-    logContainer.appendChild(div);
+    logsBody.appendChild(row);
+  });
+}
+
+
+
+const buttons =
+  document.querySelectorAll(".filters button");
+
+buttons.forEach((button) =>
+{
+  button.addEventListener("click", () =>
+  {
+    const filter =
+      button.dataset.filter;
+
+    if (filter === "all")
+    {
+      renderLogs(allLogs);
+    }
+    if (filter === "low")
+    {
+      const filtered =
+        allLogs.filter(log => log.level <= 25);
+
+      renderLogs(filtered);
+    }
+
+    if (filter === "high")
+    {
+      const filtered =
+        allLogs.filter(log => log.level >= 75);
+
+      renderLogs(filtered);
+    }
+
+    if (filter === "today")
+    {
+      const today =
+        new Date().toLocaleDateString();
+
+      const filtered =
+        allLogs.filter((log) =>
+        {
+          const logDate =
+            new Date(log.timestamp * 1000)
+            .toLocaleDateString();
+
+          return logDate === today;
+        });
+
+      renderLogs(filtered);
+    }
   });
 });

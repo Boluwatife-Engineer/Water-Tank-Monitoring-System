@@ -1,59 +1,156 @@
-@import url('https://fonts.googleapis.com/css2?family=Indie+Flower&family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Playwrite+GB+S+Guides:ital@0;1&family=Space+Grotesk:wght@300..700&family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
-    body{
-      background: #0f172a;
-      color: white;
-      font-family: "urbanist", sans-serif;
-      text-align: center;
-      margin-top: 30px;
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      padding: 20px;
-    }
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@100..900&display=swap');
 
-    .title {
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-    .tank {
-      width: 140px;
-      height: 320px;
-      border: 4px solid #38bdf8;
-      margin: auto;
-      border-radius: 12px;
-      overflow: hidden;
-      position: relative;
-      background: #1e293b;
-    }
+body{
+  background: #000;
+  color: white;
+  font-family: "Urbanist", sans-serif;
+  min-height: 100vh;
+  padding: 30px;
+}
 
-    .fill {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      height: 0%;
-      background: linear-gradient(to top, #0ea5e9, #38bdf8);
-      transition: height 0.5s ease;
-    }
+.dashboard{
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
 
-    .label {
-      margin-top: 20px;
-      font-size: 28px;
-      font-weight: bold;
-    }
+.tank-section{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-    .status {
-      margin-top: 10px;
-      font-size: 18px;
-    }
+.title{
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
 
-    .low { color: red; }
-    .mid { color: yellow; }
-    .high { color: green; }
+.tank{
+  width: 140px;
+  height: 320px;
+  border: 4px solid #38bdf8;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  background: #1e293b;
+}
+
+.fill{
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 0%;
+  background: linear-gradient(to top, #0ea5e9, #38bdf8);
+  transition: height 0.5s ease;
+}
+
+.label{
+  margin-top: 20px;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.status{
+  margin-top: 10px;
+  font-size: 18px;
+}
+
+.low{
+  color: red;
+}
+
+.mid{
+  color: yellow;
+}
+
+.high{
+  color: lime;
+}
+
+.logs-section{
+  width: 100%;
+}
+
+.logs-section h1{
+  margin-bottom: 20px;
+}
+
+.filters{
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filters button{
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: #111827;
+  color: white;
+  font-size: 14px;
+}
+
+.filters button:hover{
+  background: #38bdf8;
+}
+
+.logs-table{
+  border: 1px solid #222;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.logs-header,
+.log-item{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  padding: 14px 16px;
+  align-items: center;
+}
+
+.logs-header{
+  background: #111827;
+  font-weight: bold;
+  border-bottom: 2px solid #38bdf8;
+}
+
+.log-item{
+  border-bottom: 1px solid #222;
+}
+
+.log-item:nth-child(even){
+  background: #111;
+}
+
+#logs-body{
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+@media screen and (min-width: 900px){
+
+  .dashboard{
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .logs-section{
+    max-width: 700px;
+  }
+
+}
 
 
-    #logs {
-        margin-top: 30px;
-        text-align: left;
-        max-width: 400px;
-    }
+
+
+
