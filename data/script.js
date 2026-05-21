@@ -6,10 +6,18 @@ import {
   onValue
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-
+import { firebaseConfig } from "./secrets.js";
 
 let socket =
   new WebSocket("ws://" + location.host + "/ws");
+
+let chart;
+
+let allLogs = [];
+
+let currentFilter = "all";
+
+
 
 socket.onmessage = function(event)
 {
@@ -24,6 +32,7 @@ socket.onmessage = function(event)
     level + "%";
 
   let status = "EMPTY";
+
   let cls = "";
 
   if (level == 25)
@@ -54,20 +63,11 @@ socket.onmessage = function(event)
     document.getElementById("status");
 
   statusEl.innerText = status;
+
   statusEl.className = cls;
 };
 
 
-const firebaseConfig = {
-  apiKey: "AIzaSyC6OE3-jl73z41B4rWEO699fBBaqJPQPRI",
-  authDomain: "water-tank-monitoring-sy-9fbf3.firebaseapp.com",
-  databaseURL: "https://water-tank-monitoring-sy-9fbf3-default-rtdb.firebaseio.com",
-  projectId: "water-tank-monitoring-sy-9fbf3",
-  storageBucket: "water-tank-monitoring-sy-9fbf3.firebasestorage.app",
-  messagingSenderId: "250565556537",
-  appId: "1:250565556537:web:428aec758e7c0155b7d0e8",
-  measurementId: "G-XQVNN1GPRM"
-};
 
 const app =
   initializeApp(firebaseConfig);
@@ -77,10 +77,6 @@ const db =
 
 const logsRef =
   ref(db, "/tank/logs");
-
-
-
-let allLogs = [];
 
 
 
@@ -98,9 +94,10 @@ onValue(logsRef, (snapshot) =>
     };
   });
 
-  allLogs.reverse();
+  allLogs.sort((a, b) =>
+    a.timestamp - b.timestamp);
 
-  renderLogs(allLogs);
+  applyFilter(currentFilter);
 });
 
 
@@ -112,7 +109,10 @@ function renderLogs(logs)
 
   logsBody.innerHTML = "";
 
-  logs.forEach((log) =>
+  const latestLogs =
+    [...logs].reverse().slice(0, 20);
+
+  latestLogs.forEach((log) =>
   {
     const dateObj =
       new Date(log.timestamp * 1000);
@@ -140,6 +140,183 @@ function renderLogs(logs)
 
 
 
+function renderChart(logs)
+{
+  const latestLogs =
+    logs.slice(-20);
+
+  const labels =
+    latestLogs.map((log) =>
+    {
+      const date =
+        new Date(log.timestamp * 1000);
+
+      return date.toLocaleTimeString();
+    });
+
+  const levels =
+    latestLogs.map((log) =>
+      log.level);
+
+  const ctx =
+    document.getElementById("levelChart");
+
+  if (chart)
+  {
+    chart.destroy();
+  }
+
+  chart = new Chart(ctx,
+  {
+    type: "line",
+
+    data:
+    {
+      labels: labels,
+
+      datasets:
+      [
+        {
+          label: "Water Level",
+
+          data: levels,
+
+          borderColor: "#38bdf8",
+
+          backgroundColor:
+            "rgba(56,189,248,0.15)",
+
+          fill: true,
+
+          tension: 0.45,
+
+          cubicInterpolationMode:
+            "monotone",
+
+          borderWidth: 4,
+
+          pointRadius: 5,
+
+          pointHoverRadius: 8,
+
+          pointBackgroundColor:
+            "#38bdf8",
+
+          pointBorderColor:
+            "#ffffff",
+
+          pointBorderWidth: 2,
+
+          pointStyle: "circle"
+        }
+      ]
+    },
+
+    options:
+    {
+      responsive: true,
+
+      maintainAspectRatio: false,
+
+      animation:
+      {
+        duration: 700
+      },
+
+      plugins:
+      {
+        legend:
+        {
+          labels:
+          {
+            color: "white"
+          }
+        }
+      },
+
+      scales:
+      {
+        x:
+        {
+          ticks:
+          {
+            color: "white"
+          },
+
+          grid:
+          {
+            color:
+              "rgba(255,255,255,0.08)"
+          }
+        },
+
+        y:
+        {
+          min: 0,
+
+          max: 100,
+
+          ticks:
+          {
+            color: "white"
+          },
+
+          grid:
+          {
+            color:
+              "rgba(255,255,255,0.08)"
+          }
+        }
+      }
+    }
+  });
+}
+
+
+
+function applyFilter(filter)
+{
+  currentFilter = filter;
+
+  let filtered = allLogs;
+
+  if (filter === "low")
+  {
+    filtered =
+      allLogs.filter((log) =>
+        log.level <= 25);
+  }
+
+  if (filter === "high")
+  {
+    filtered =
+      allLogs.filter((log) =>
+        log.level >= 75);
+  }
+
+  if (filter === "today")
+  {
+    const today =
+      new Date().toLocaleDateString();
+
+    filtered =
+      allLogs.filter((log) =>
+      {
+        const logDate =
+          new Date(log.timestamp * 1000)
+          .toLocaleDateString();
+
+        return logDate === today;
+      });
+  }
+
+  renderLogs(filtered);
+
+  renderChart(filtered);
+}
+
+
+
 const buttons =
   document.querySelectorAll(".filters button");
 
@@ -150,42 +327,6 @@ buttons.forEach((button) =>
     const filter =
       button.dataset.filter;
 
-    if (filter === "all")
-    {
-      renderLogs(allLogs);
-    }
-    if (filter === "low")
-    {
-      const filtered =
-        allLogs.filter(log => log.level <= 25);
-
-      renderLogs(filtered);
-    }
-
-    if (filter === "high")
-    {
-      const filtered =
-        allLogs.filter(log => log.level >= 75);
-
-      renderLogs(filtered);
-    }
-
-    if (filter === "today")
-    {
-      const today =
-        new Date().toLocaleDateString();
-
-      const filtered =
-        allLogs.filter((log) =>
-        {
-          const logDate =
-            new Date(log.timestamp * 1000)
-            .toLocaleDateString();
-
-          return logDate === today;
-        });
-
-      renderLogs(filtered);
-    }
+    applyFilter(filter);
   });
 });

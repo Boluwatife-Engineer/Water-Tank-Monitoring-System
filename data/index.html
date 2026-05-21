@@ -34,15 +34,23 @@
 
     </div>
 
+    <div class="chart-section">
+      <h1>Water Level chart</h1>
+      <canvas id="levelChart"></canvas>
+    </div>
 
 
-    <div class="logs-section">
+    </div>
+
+  </div>
+
+  <div class="logs-section">
 
       <h1>Data Logs</h1>
 
       <div class="filters">
 
-        <button data-filter="all">
+        <button data-filter="all" class="all">
           All
         </button>
 
@@ -74,12 +82,14 @@
 
       </div>
 
-    </div>
-
-  </div>
-
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="script.js" type="module"></script>
 
 </body>
 
 </html>
+
+
+
+

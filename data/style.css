@@ -82,6 +82,21 @@ body{
   margin-bottom: 20px;
 }
 
+
+.chart-section{
+
+  width: 100%;
+  max-width: 700px;
+  height: 350px;
+
+  
+
+  canvas{
+    background-color: rgb(21, 21, 22);
+    padding: 30px;
+  }
+}
+
 .filters{
   display: flex;
   gap: 10px;
@@ -100,6 +115,10 @@ body{
 }
 
 .filters button:hover{
+  background: #38bdf8;
+}
+
+.filters button.active{
   background: #38bdf8;
 }
 
