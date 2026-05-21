@@ -6,5 +6,6 @@ export const firebaseConfig = {
   storageBucket: "water-tank-monitoring-sy-9fbf3.firebasestorage.app",
   messagingSenderId: "250565556537",
   appId: "1:250565556537:web:428aec758e7c0155b7d0e8",
+  
   measurementId: "G-XQVNN1GPRM"
 };
