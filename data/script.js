@@ -6,7 +6,7 @@ import {
   onValue
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-import { firebaseConfig } from "./secrets.js";
+import { firebaseConfig } from "./Secrets";
 
 let socket =
   new WebSocket("ws://" + location.host + "/ws");
