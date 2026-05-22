@@ -10,6 +10,7 @@
 #include <FirebaseClient.h>
 #include "secrets.h"
 #include <time.h>
+#include "analytics.h"
 
 const int L1 = 21;
 const int L2 = 22;
@@ -169,6 +170,7 @@ void loop()
     lastUpdate = millis();
 
     int currentLevel = readLevel();
+    updateAnalytics(currentLevel);
 
     
     String json = "{\"level\":" + String(currentLevel) + "}";
@@ -201,6 +203,38 @@ void loop()
       );
 
       Serial.println("Logged level change");
+
+      Database.set<int>(
+        aClient,
+        "/tank/analytics/highest",
+        getHighestLevel(),
+        processData,
+        "highestTask"
+      );
+
+      Database.set<int>(
+        aClient,
+        "/tank/analytics/lowest",
+        getLowestLevel(),
+        processData,
+        "lowestTask"
+      );
+
+      Database.set<float>(
+        aClient,
+        "/tank/analytics/average",
+        getAverageLevel(),
+        processData,
+        "averageTask"
+      );
+
+      Database.set<int>(
+        aClient,
+        "/tank/analytics/changes",
+        getChangeCount(),
+        processData,
+        "changesTask"
+      );
     }
   }
 }
