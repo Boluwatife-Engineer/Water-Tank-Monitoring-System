@@ -6,7 +6,7 @@ import {
   onValue
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-import { firebaseConfig } from "./Secrets";
+
 
 let socket =
   new WebSocket("ws://" + location.host + "/ws");
@@ -68,6 +68,17 @@ socket.onmessage = function(event)
 };
 
 
+
+export const firebaseConfig = {
+  apiKey: "AIzaSyC6OE3-jl73z41B4rWEO699fBBaqJPQPRI",
+  authDomain: "water-tank-monitoring-sy-9fbf3.firebaseapp.com",
+  databaseURL: "https://water-tank-monitoring-sy-9fbf3-default-rtdb.firebaseio.com",
+  projectId: "water-tank-monitoring-sy-9fbf3",
+  storageBucket: "water-tank-monitoring-sy-9fbf3.firebasestorage.app",
+  messagingSenderId: "250565556537",
+  appId: "1:250565556537:web:428aec758e7c0155b7d0e8",
+  measurementId: "G-XQVNN1GPRM"
+};
 
 const app =
   initializeApp(firebaseConfig);

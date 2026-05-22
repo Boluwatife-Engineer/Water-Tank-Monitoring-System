@@ -9,4 +9,3 @@
 *.map
 build/
 /include/secrets.h
-/data/Secrets.js
