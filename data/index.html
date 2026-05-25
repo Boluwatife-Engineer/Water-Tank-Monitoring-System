@@ -3,10 +3,9 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <link rel="stylesheet" href="./style.css">
-
   <title>Water Level Monitor</title>
 </head>
 
@@ -14,82 +13,84 @@
 
   <div class="dashboard">
 
-    <div class="tank-section">
+    <div class="top">
 
-      <div class="title">
-        WATER LEVEL MONITOR
+      <div class="tank-section">
+        <div class="title">WATER LEVEL MONITOR</div>
+
+        <div class="tank">
+          <div class="fill" id="fill"></div>
+        </div>
+
+        <div class="label" id="percent">0%</div>
+        <div class="status" id="status">EMPTY</div>
       </div>
 
-      <div class="tank">
-        <div class="fill" id="fill"></div>
-      </div>
-
-      <div class="label" id="percent">
-        0%
-      </div>
-
-      <div class="status" id="status">
-        EMPTY
+      <div class="chart-section">
+        <h1>Water Level Chart</h1>
+        <canvas id="levelChart"></canvas>
       </div>
 
     </div>
 
-    <div class="chart-section">
-      <h1>Water Level chart</h1>
-      <canvas id="levelChart"></canvas>
-    </div>
+    <div class="bottom">
 
+      <div class="analytics">
+
+        <div class="card">
+          <h3>Highest</h3>
+          <p id="highest">0%</p>
+        </div>
+
+        <div class="card">
+          <h3>Lowest</h3>
+          <p id="lowest">0%</p>
+        </div>
+
+        <div class="card">
+          <h3>Average</h3>
+          <p id="average">0%</p>
+        </div>
+
+        <div class="card">
+          <h3>Changes</h3>
+          <p id="changes">0</p>
+        </div>
+
+      </div>
+
+      <div class="logs-section">
+
+        <h1>Data Logs</h1>
+
+        <div class="filters">
+          <button data-filter="all">All</button>
+          <button data-filter="today">Today</button>
+          <button data-filter="low">Low</button>
+          <button data-filter="high">High</button>
+        </div>
+
+        <div class="logs-table">
+
+          <div class="logs-header">
+            <span>Date</span>
+            <span>Time</span>
+            <span>Level</span>
+          </div>
+
+          <div id="logs-body"></div>
+
+        </div>
+
+      </div>
 
     </div>
 
   </div>
 
-  <div class="logs-section">
-
-      <h1>Data Logs</h1>
-
-      <div class="filters">
-
-        <button data-filter="all" class="all">
-          All
-        </button>
-
-        <button data-filter="today">
-          Today
-        </button>
-        <button data-filter="low">
-          Low
-        </button>
-
-        <button data-filter="high">
-          High
-        </button>
-
-
-      </div>
-
-
-
-      <div class="logs-table">
-
-        <div class="logs-header">
-          <span>Date</span>
-          <span>Time</span>
-          <span>Level</span>
-        </div>
-
-        <div id="logs-body"></div>
-
-      </div>
-
-  
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="script.js" type="module"></script>
 
 </body>
 
 </html>
-
-
-
-

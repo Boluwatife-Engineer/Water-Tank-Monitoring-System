@@ -11,36 +11,45 @@ body{
   color: white;
   font-family: "Urbanist", sans-serif;
   min-height: 100vh;
-  padding: 30px;
-  overflow-x: hidden;
+  padding: 16px;
 }
 
 .dashboard{
   display: flex;
   flex-direction: column;
-  gap: 40px;
-  align-items: center;
+  gap: 20px;
+}
+
+
+
+.top{
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .tank-section{
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-left: 7%;
-  flex: 1;
+  
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.06);
 }
 
 .title{
-  font-size: 28px;
-  font-weight: bold;
-  margin-bottom: 20px;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 12px;
 }
 
 .tank{
-  width: 300px;
-  height: 520px;
-  border: 4px solid #38bdf8;
-  border-radius: 12px;
+  width: 220px;
+  height: 380px;
+  border: 3px solid #38bdf8;
+  border-radius: 14px;
   overflow: hidden;
   position: relative;
   background: #1e293b;
@@ -52,87 +61,123 @@ body{
   width: 100%;
   height: 0%;
   background: linear-gradient(to top, #0ea5e9, #38bdf8);
-  transition: height 0.5s ease;
+  transition: height 0.4s ease;
 }
 
 .label{
-  margin-top: 20px;
-  font-size: 32px;
-  font-weight: bold;
+  margin-top: 12px;
+  font-size: 26px;
+  font-weight: 700;
 }
 
 .status{
-  margin-top: 10px;
-  font-size: 18px;
+  margin-top: 6px;
+  font-size: 14px;
 }
 
-.low{
-  color: red;
-}
+.low{ color: #ef4444; }
+.mid{ color: #facc15; }
+.high{ color: #22c55e; }
 
-.mid{
-  color: yellow;
-}
-
-.high{
-  color: lime;
-}
-
-.logs-section{
-  width: 100%;
-  margin-top: 50px;
-
-}
-
-.logs-section h1{
-  margin-bottom: 40px;
-  margin-top: 40px;
-}
 
 
 .chart-section{
-
-  width: 100%;
-  max-width: 700px;
-  height: 550px;
-  margin-right: 7%;
-
-
   
-
-  canvas{
-    background-color: rgb(21, 21, 22);
-    padding: 30px;
-  }
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.06);
+  height: 320px;
 }
+
+.chart-section h1{
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.chart-section canvas{
+  width: 100% !important;
+  height: 260px !important;
+  background: #111827;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+
+
+.bottom{
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+
+
+.analytics{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.card{
+  background-color: #94a3b8;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.06);
+  text-align: center;
+}
+
+.card h3{
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.card p{
+  font-size: 20px;
+  font-weight: 700;
+  color: #38bdf8;
+  margin-top: 6px;
+}
+
+
 
 .filters{
   display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: 8px;
   flex-wrap: wrap;
+  margin-bottom: 10px;
 }
 
 .filters button{
-  padding: 10px 18px;
+  padding: 8px 10px;
   border: none;
   border-radius: 8px;
-  cursor: pointer;
   background: #111827;
   color: white;
-  font-size: 14px;
+  font-size: 12px;
+  cursor: pointer;
 }
 
 .filters button:hover{
   background: #38bdf8;
+  color: black;
 }
 
-.filters button.active{
-  background: #38bdf8;
+
+
+.logs-section{
+  
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.logs-section h1{
+  font-size: 16px;
+  margin-bottom: 10px;
 }
 
 .logs-table{
-  border: 1px solid #222;
+  border: 1px solid #1f2937;
   border-radius: 12px;
   overflow: hidden;
 }
@@ -141,45 +186,65 @@ body{
 .log-item{
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  padding: 14px 16px;
-  align-items: center;
+  padding: 10px;
+  font-size: 12px;
 }
 
 .logs-header{
   background: #111827;
-  font-weight: bold;
-  border-bottom: 2px solid #38bdf8;
+  font-weight: 600;
+  border-bottom: 1px solid #38bdf8;
 }
 
 .log-item{
-  border-bottom: 1px solid #222;
+  border-bottom: 1px solid #1f2937;
 }
 
 .log-item:nth-child(even){
-  background: #111;
+  background: #0b0b0b;
 }
 
 #logs-body{
-  max-height: 500px;
+  max-height: 300px;
   overflow-y: auto;
 }
 
+
+
 @media screen and (min-width: 768px){
 
-  .dashboard{
+  body{
+    padding: 24px;
+  }
+
+  .top{
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .bottom{
     flex-direction: row;
     align-items: flex-start;
-    justify-content: space-between;
+  }
+
+  .tank-section{
+    flex: 1;
+  }
+
+  .chart-section{
+    flex: 1;
+    height: 360px;
+  }
+
+  .analytics{
+    flex: 1;
   }
 
   .logs-section{
-    margin: auto;
-
+    flex: 1;
   }
 
+  #logs-body{
+    max-height: 420px;
+  }
 }
-
-
-
-
-
