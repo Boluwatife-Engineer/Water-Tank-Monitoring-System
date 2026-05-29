@@ -10,6 +10,7 @@
 #include <time.h>
 #include "analytics.h"
 #include "secrets.h"
+#include "email.h"
 
 const int L1 = 21;
 const int L2 = 22;
@@ -28,24 +29,32 @@ AsyncWebSocket ws("/ws");
 
 int lastLevel = -1;
 
-int stableRead(int pin){
+/* EMAIL TIMER */
+unsigned long lastEmailTime = 0;
+const unsigned long EMAIL_INTERVAL = 2 * 60 * 1000; // 2 minutes test
+
+int stableRead(int pin)
+{
   int low = 0;
-  for(int i = 0; i < 10; i++){
-    if(digitalRead(pin) == LOW) low++;
+  for (int i = 0; i < 10; i++)
+  {
+    if (digitalRead(pin) == LOW) low++;
     delay(5);
   }
   return (low >= 7) ? LOW : HIGH;
 }
 
-int readLevel(){
-  if(stableRead(L4) == LOW) return 100;
-  if(stableRead(L3) == LOW) return 75;
-  if(stableRead(L2) == LOW) return 50;
-  if(stableRead(L1) == LOW) return 25;
+int readLevel()
+{
+  if (stableRead(L4) == LOW) return 100;
+  if (stableRead(L3) == LOW) return 75;
+  if (stableRead(L2) == LOW) return 50;
+  if (stableRead(L1) == LOW) return 25;
   return 0;
 }
 
-void setup(){
+void setup()
+{
   Serial.begin(115200);
 
   pinMode(L1, INPUT_PULLUP);
@@ -53,33 +62,25 @@ void setup(){
   pinMode(L3, INPUT_PULLUP);
   pinMode(L4, INPUT_PULLUP);
 
-  if(!LittleFS.begin(true)){
-    Serial.println("LittleFS mount failed");
+  if (!LittleFS.begin(true))
+  {
+    Serial.println("LittleFS failed");
     return;
   }
-  Serial.println("LittleFS mounted");
 
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
-  Serial.print("Connecting WiFi");
-  while(WiFi.status() != WL_CONNECTED){
+  Serial.print("WiFi connecting");
+  while (WiFi.status() != WL_CONNECTED)
+  {
     delay(500);
     Serial.print(".");
   }
 
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.print("IP: ");
+  Serial.println("\nWiFi connected");
   Serial.println(WiFi.localIP());
 
   configTime(0, 0, "pool.ntp.org");
-
-  time_t now = time(nullptr);
-  while(now < 100000){
-    delay(200);
-    now = time(nullptr);
-  }
-  Serial.println("Time synced");
 
   ssl.setInsecure();
 
@@ -94,41 +95,44 @@ void setup(){
   app.getApp<RealtimeDatabase>(Database);
   Database.url(DATABASE_URL);
 
-  ws.onEvent([](AsyncWebSocket *server,
-                AsyncWebSocketClient *client,
-                AwsEventType type,
-                void *arg,
-                uint8_t *data,
-                size_t len){
-
-    if(type == WS_EVT_CONNECT){
+  ws.onEvent([](AsyncWebSocket*, AsyncWebSocketClient*, AwsEventType type, void*, uint8_t*, size_t)
+  {
+    if (type == WS_EVT_CONNECT)
       Serial.println("WS connected");
-    }
   });
 
   server.addHandler(&ws);
 
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
+  {
     request->send(LittleFS, "/index.html", "text/html");
   });
 
-  server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request){
+  server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request)
+  {
     request->send(LittleFS, "/style.css", "text/css");
   });
 
-  server.on("/script.js", HTTP_GET, [](AsyncWebServerRequest *request){
+  server.on("/script.js", HTTP_GET, [](AsyncWebServerRequest *request)
+  {
     request->send(LittleFS, "/script.js", "application/javascript");
   });
 
   server.begin();
+
+  initEmail();
 }
 
-void loop(){
+
+void loop()
+{
+  
   app.loop();
 
   static unsigned long t = 0;
 
-  if(millis() - t >= 1000){
+  if (millis() - t >= 1000)
+  {
     t = millis();
 
     int level = readLevel();
@@ -137,7 +141,8 @@ void loop(){
 
     ws.textAll(String("{\"level\":") + level + "}");
 
-    if(level != lastLevel){
+    if (level != lastLevel)
+    {
       lastLevel = level;
 
       time_t now = time(nullptr);
@@ -151,7 +156,27 @@ void loop(){
       Database.set<float>(aClient, "/tank/analytics/average", getAverageLevel(), nullptr, "a");
       Database.set<int>(aClient, "/tank/analytics/changes", getChangeCount(), nullptr, "c");
 
-      Serial.println("Data pushed");
+      Serial.println("Firebase updated");
+    }
+
+    /* EMAIL TEST TRIGGER */
+    if (millis() - lastEmailTime >= EMAIL_INTERVAL)
+    {
+      lastEmailTime = millis();
+
+      Serial.println("Sending email...");
+
+      bool ok = sendDailyEmail(
+        getHighestLevel(),
+        getLowestLevel(),
+        getAverageLevel(),
+        getChangeCount()
+      );
+
+      if (ok)
+        Serial.println("MAIL STATUS: SENT");
+      else
+        Serial.println("MAIL STATUS: FAILED");
     }
   }
 }
