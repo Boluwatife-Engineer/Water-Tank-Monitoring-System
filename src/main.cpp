@@ -8,6 +8,7 @@
 #include <LittleFS.h>
 #include <FirebaseClient.h>
 #include <time.h>
+
 #include "analytics.h"
 #include "secrets.h"
 #include "email.h"
@@ -31,16 +32,18 @@ int lastLevel = -1;
 
 /* EMAIL TIMER */
 unsigned long lastEmailTime = 0;
-const unsigned long EMAIL_INTERVAL = 2 * 60 * 1000; // 2 minutes test
+const unsigned long EMAIL_INTERVAL = 2 * 60 * 1000; // test interval
 
 int stableRead(int pin)
 {
   int low = 0;
+
   for (int i = 0; i < 10; i++)
   {
     if (digitalRead(pin) == LOW) low++;
     delay(5);
   }
+
   return (low >= 7) ? LOW : HIGH;
 }
 
@@ -64,13 +67,14 @@ void setup()
 
   if (!LittleFS.begin(true))
   {
-    Serial.println("LittleFS failed");
+    Serial.println("LittleFS mount failed");
     return;
   }
 
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
   Serial.print("WiFi connecting");
+
   while (WiFi.status() != WL_CONNECTED)
   {
     delay(500);
@@ -78,7 +82,12 @@ void setup()
   }
 
   Serial.println("\nWiFi connected");
+
+  Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
+
+  Serial.print("RSSI: ");
+  Serial.println(WiFi.RSSI());
 
   configTime(0, 0, "pool.ntp.org");
 
@@ -95,10 +104,14 @@ void setup()
   app.getApp<RealtimeDatabase>(Database);
   Database.url(DATABASE_URL);
 
+  initEmail();
+
   ws.onEvent([](AsyncWebSocket*, AsyncWebSocketClient*, AwsEventType type, void*, uint8_t*, size_t)
   {
     if (type == WS_EVT_CONNECT)
-      Serial.println("WS connected");
+    {
+      Serial.println("WebSocket connected");
+    }
   });
 
   server.addHandler(&ws);
@@ -120,13 +133,11 @@ void setup()
 
   server.begin();
 
-  initEmail();
+  Serial.println("System ready");
 }
-
 
 void loop()
 {
-  
   app.loop();
 
   static unsigned long t = 0;
@@ -159,7 +170,6 @@ void loop()
       Serial.println("Firebase updated");
     }
 
-    /* EMAIL TEST TRIGGER */
     if (millis() - lastEmailTime >= EMAIL_INTERVAL)
     {
       lastEmailTime = millis();
@@ -173,10 +183,7 @@ void loop()
         getChangeCount()
       );
 
-      if (ok)
-        Serial.println("MAIL STATUS: SENT");
-      else
-        Serial.println("MAIL STATUS: FAILED");
+      Serial.println(ok ? "EMAIL SENT" : "EMAIL FAILED");
     }
   }
 }

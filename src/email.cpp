@@ -15,6 +15,7 @@ void smtpCallback(SMTP_Status status)
 void initEmail()
 {
   smtp.debug(1);
+  smtp.callback(smtpCallback);
 }
 
 bool sendDailyEmail(int highest, int lowest, float average, int changes)
@@ -29,17 +30,17 @@ bool sendDailyEmail(int highest, int lowest, float average, int changes)
   session.login.password = EMAIL_APP_PASSWORD;
   session.login.user_domain = "";
 
+  
   session.secure.startTLS = false;
 
   message.sender.name = "Tank Monitor";
   message.sender.email = EMAIL_USER;
 
   message.subject = "Water Tank Daily Report";
-
   message.addRecipient("User", RECIPIENT_EMAIL);
 
   String body =
-    "Daily Water Tank Report\n\n"
+    String("Daily Water Tank Report\n\n") +
     "Highest: " + String(highest) + "%\n" +
     "Lowest: " + String(lowest) + "%\n" +
     "Average: " + String(average) + "%\n" +
@@ -47,16 +48,13 @@ bool sendDailyEmail(int highest, int lowest, float average, int changes)
 
   message.text.content = body.c_str();
   message.text.charSet = "utf-8";
-  message.text.transfer_encoding =
-    Content_Transfer_Encoding::enc_7bit;
-
-  smtp.callback(smtpCallback);
+  message.text.transfer_encoding = Content_Transfer_Encoding::enc_7bit;
 
   Serial.println("SMTP connecting...");
 
   if (!smtp.connect(&session))
   {
-    Serial.print("SMTP connect failed: ");
+    Serial.print("SMTP CONNECT FAILED: ");
     Serial.println(smtp.errorReason());
     return false;
   }
@@ -72,5 +70,9 @@ bool sendDailyEmail(int highest, int lowest, float average, int changes)
 
   Serial.println("MAIL SENT SUCCESSFULLY");
 
+  smtp.sendingResult.clear();
+
   return true;
 }
+
+
